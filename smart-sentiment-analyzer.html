@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Sentiment Analyzer | Modern AI Tool</title>
+    <!-- Google Fonts for Modern Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Color Palette */
+            --primary: #8a2be2;
+            --primary-light: #b066ff;
+            --secondary: #4facfe;
+            --bg-gradient: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --text-main: #ffffff;
+            --text-dim: rgba(255, 255, 255, 0.7);
+            
+            /* Sentiment Colors */
+            --pos-color: #00f2fe;
+            --neg-color: #f77062;
+            --neu-color: #f6d365;
+            
+            /* Animations */
+            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Animated Background Blobs */
+        .blob {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            z-index: -1;
+            animation: move linear 20s infinite alternate;
+        }
+
+        .blob-1 { top: -100px; left: -100px; }
+        .blob-2 { bottom: -100px; right: -100px; width: 500px; height: 500px; animation-duration: 25s; }
+
+        @keyframes move {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(100px, 100px) scale(1.2); }
+        }
+
+        /* Glass Container Styling */
+        .container {
+            width: 90%;
+            max-width: 600px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: 28px;
+            padding: 50px 40px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            z-index: 10;
+            animation: slideIn 1s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Typography */
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #fff, var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+        }
+
+        p.subtitle {
+            color: var(--text-dim);
+            margin-bottom: 35px;
+            font-size: 1.1rem;
+            font-weight: 300;
+        }
+
+        /* Input Area Styles */
+        .input-group {
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 140px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 18px;
+            padding: 20px;
+            color: #fff;
+            font-size: 1.05rem;
+            resize: none;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        textarea:focus {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--secondary);
+            box-shadow: 0 0 20px rgba(79, 172, 254, 0.2);
+        }
+
+        textarea::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .input-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 8px;
+            padding: 0 5px;
+        }
+
+        .char-counter {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+        }
+
+        .error-msg {
+            font-size: 0.85rem;
+            color: var(--neg-color);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .error-msg.visible {
+            opacity: 1;
+        }
+
+        /* Buttons Section */
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 16px 25px;
+            border-radius: 15px;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: 0 10px 20px rgba(138, 43, 226, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 15px 25px rgba(138, 43, 226, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(1px) scale(0.98);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid var(--glass-border);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Result Section */
+        .result-card {
+            margin-top: 40px;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            display: none; /* Hidden by default */
+            opacity: 0;
+            transform: scale(0.9);
+            transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+
+        .result-card.show {
+            display: block;
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .result-emoji {
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+        }
+
+        .result-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .sentiment-score {
+            font-size: 1rem;
+            margin-top: 5px;
+            color: var(--text-dim);
+        }
+
+        /* Responsive Designs */
+        @media (max-width: 480px) {
+            .container {
+                padding: 35px 20px;
+                border-radius: 24px;
+            }
+            h1 { font-size: 2rem; }
+            .button-group { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Dynamic Decoration Blobs -->
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <div class="container">
+        <h1>Sentiment Analyzer</h1>
+        <p class="subtitle">Understand the emotion behind your text instantly.</p>
+
+        <div class="input-group">
+            <textarea id="textInput" placeholder="How are you feeling today? Type here..."></textarea>
+            <div class="input-footer">
+                <span id="errorLabel" class="error-msg">Please enter some text first!</span>
+                <span id="charCount" class="char-counter">0 / 500 characters</span>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button class="btn btn-primary" onclick="analyzeSentiment()">
+                <span>Analyze Sentiment</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+            </button>
+            <button class="btn btn-secondary" onclick="clearInput()">
+                <span>Reset</span>
+            </button>
+        </div>
+
+        <!-- Animated Result Container -->
+        <div id="resultBox" class="result-card">
+            <div id="resultEmoji" class="result-emoji">😐</div>
+            <div id="resultTitle" class="result-text">Neutral</div>
+            <div id="resultScore" class="sentiment-score">Score: 0</div>
+        </div>
+    </div>
+
+    <script>
+        const textarea = document.getElementById('textInput');
+        const charCount = document.getElementById('charCount');
+        const resultBox = document.getElementById('resultBox');
+        const errorLabel = document.getElementById('errorLabel');
+
+        // Logic Data
+        const sentiments = {
+            positive: ['good', 'happy', 'awesome', 'great', 'love', 'excellent', 'amazing', 'wonderful', 'joy', 'fantastic', 'best'],
+            negative: ['bad', 'sad', 'worst', 'hate', 'angry', 'terrible', 'awful', 'horrible', 'poor', 'unhappy', 'no']
+        };
+
+        // Real-time Character Counter
+        textarea.addEventListener('input', () => {
+            const length = textarea.value.length;
+            charCount.textContent = `${length} / 500 characters`;
+            
+            // Limit characters
+            if (length > 500) {
+                textarea.value = textarea.value.substring(0, 500);
+            }
+
+            // Remove error message when user starts typing
+            if (length > 0) {
+                errorLabel.classList.remove('visible');
+            }
+        });
+
+        /**
+         * Core Sentiment Analysis Function
+         * Uses simple keyword matching to determine emotional state.
+         */
+        function analyzeSentiment() {
+            const text = textarea.value.trim().toLowerCase();
+            
+            // Empty State Validation
+            if (!text) {
+                errorLabel.classList.add('visible');
+                resultBox.classList.remove('show');
+                
+                // Set boundary color to error
+                textarea.style.borderColor = 'var(--neg-color)';
+                setTimeout(() => textarea.style.borderColor = '', 1000);
+                return;
+            }
+
+            // Word-based scoring logic
+            let score = 0;
+            const words = text.split(/\W+/); // Split by non-word characters
+
+            words.forEach(word => {
+                if (sentiments.positive.includes(word)) score++;
+                if (sentiments.negative.includes(word)) score--;
+            });
+
+            displayResult(score);
+        }
+
+        /**
+         * Displays the final result with appropriate animations and colors
+         */
+        function displayResult(score) {
+            let label = "Neutral";
+            let emoji = "😐";
+            let color = "var(--neu-color)";
+
+            if (score > 0) {
+                label = "Positive";
+                emoji = "😊";
+                color = "var(--pos-color)";
+            } else if (score < 0) {
+                label = "Negative";
+                emoji = "😞";
+                color = "var(--neg-color)";
+            }
+
+            // Prepare elements
+            const emojiEl = document.getElementById('resultEmoji');
+            const titleEl = document.getElementById('resultTitle');
+            const scoreEl = document.getElementById('resultScore');
+
+            // Set content
+            emojiEl.textContent = emoji;
+            titleEl.textContent = label;
+            titleEl.style.color = color;
+            scoreEl.textContent = `Calculated Score: ${score}`;
+
+            // Reveal result card with animation
+            resultBox.style.display = 'block';
+            setTimeout(() => {
+                resultBox.classList.add('show');
+            }, 50);
+        }
+
+        /**
+         * Clears all inputs and resets UI states
+         */
+        function clearInput() {
+            textarea.value = '';
+            charCount.textContent = '0 / 500 characters';
+            errorLabel.classList.remove('visible');
+            
+            // Hide result card with animation
+            resultBox.classList.remove('show');
+            setTimeout(() => {
+                resultBox.style.display = 'none';
+            }, 500);
+        }
+
+        // Feature: Focus textarea automatically on load
+        window.onload = () => textarea.focus();
+    </script>
+</body>
+</html>
